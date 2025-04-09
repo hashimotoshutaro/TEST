@@ -1,3 +1,144 @@
+Public setubimei As String
+Public username As String
+
+
+Private Sub lst設備名_使用者_Click()
+    setubimei = Me.lst設備名_使用者.List(Me.lst設備名_使用者.ListIndex, 0)
+    username = Me.lst設備名_使用者.List(Me.lst設備名_使用者.ListIndex, 1)
+End Sub
+
+Private Sub btn検索_Click()
+    If setubimei = "" Then
+        MsgBox ("設備名を選択してください")
+    Else
+        SearchForm2.Label1.Caption = setubimei
+        SearchForm2.Show
+    End If
+End Sub
+
+Private Sub UserForm_Initialize()
+    
+    With Me.lst設備名_使用者
+        .ColumnCount = 2
+        .ColumnWidths = "90;10"
+        .ColumnHeads = True
+        .RowSource = Worksheets("設備名_使用者").Range("A2:B20").Address(External:=True)
+        '.List = Worksheets("設備名_使用者").Range("A2:B20").Value
+        End With
+        
+End Sub
+
+Private Sub btnキャンセル_Click()
+    SearchForm.Hide
+End Sub
+
+Public Function Send_setubimei_username(setubimei, username) As String
+    
+End Function
+
+-----------------------------------------------------------------------------
+Public txtKata As String
+Public txtMei As String
+Public MachineName As String
+
+Private Sub btnキャンセル_Click()
+    Me.Hide
+End Sub
+
+
+Private Sub btn画像検索_Click()
+    Dim Pathname As String
+    Dim FulPathname As String
+    Pathname = SearchForm2.Label1.Caption
+    FullPathname = "C:\Users\shumi\OneDrive\デスクトップ\VBA\写真\" & Pathname
+    'FullPathname = "C:\Users\shumi\OneDrive\デスクトップ\VBA\写真"
+    ThisWorkbook.FollowHyperlink (FullPathname)
+End Sub
+
+Private Sub btn検索_Click()
+    
+'変数宣言
+    Dim LastRow As Long
+    Dim LastColumn As Long
+    Dim FindKW As String
+    Dim ScopeRownum As Long
+    Dim ScopeRange As Range
+    Dim arr As Variant
+    
+
+'    テキストボックスの値を変数に代入｡検索列指定
+    txtKata = txt型番.Value
+    txtMei = txt名称.Value
+    If txtKata <> "" And txtMei = "" Then
+        FindKW = txtKata
+        ScopeRownum = 2
+    ElseIf txtMei <> "" And txtKata = "" Then
+        FindKW = txtMei
+        ScopeRownum = 5
+    ElseIf txtKata <> "" And txtMei <> "" Then
+        MsgBox "型番か名称のどちらか片方のみで入力したください"
+        Exit Sub
+    ElseIf txtKata = "" And txtMei = "" Then
+        MsgBox "型番か名称のどちらかを入力したください"
+        Exit Sub
+    End If
+    Worksheets("データベース").Select
+    LastRow = Cells(Rows.Count, ScopeRownum).End(xlUp).Row
+    MsgBox (LastRow)
+    Set ScopeRange = Range(Cells(2, ScopeRownum), Cells(LastRow, ScopeRownum))
+    ScopeRange.Select
+    If ScopeRownum = 2 Then
+        Call FindData(FindKW, ScopeRange)
+    Else
+        Dim arr1() As String
+        ReDim arr1(LastRow, 4)
+        Call inStrData(LastRow, FindKW, arr1)
+    End If
+    
+        
+End Sub
+
+'ユーザー定義関数
+Function FindData(KeyWord As String, ScopeRange As Variant) As Range
+    Dim FindRange As Range
+    Set FindRange = ScopeRange.Find(KeyWord, LookAt:=xlWhole)
+    If FindRange Is Nothing Then
+        MsgBox "'" & KeyWord & "'はデータベースに登録されていません"
+    Else
+        MsgBox "'" & KeyWord & "'は" & FindRange.Row & "行目にあります"
+        ResultForm.ResultLabel1.Caption = KeyWord
+        ResultForm.ResultLabel2.Caption = Cells(FindRange.Row, 4)
+        ResultForm.ResultLabel3.Caption = Cells(FindRange.Row, 2)
+        ResultForm.Image1.Picture = LoadPicture("C:\Users\shumi\OneDrive\デスクトップ\VBA\写真\ガスろう付装置1号機\" & Cells(FindRange.Row, 3))
+        ResultForm.Show
+        Me.Hide
+    End If
+End Function
+
+Function inStrData(LastRow As Long, FindKW As String, arr1() As String) As Range
+    Dim num As Long
+    num = 1
+    For i = 1 To LastRow
+        If InStr(Cells(i, 5), FindKW) > 0 Then
+            For j = 1 To 5
+                Worksheets("検索結果").Cells(num, j).Value = Cells(i, j)
+            Next j
+            num = num + 1
+        End If
+    Next i
+    Worksheets("検索結果").Select
+    ResultForm.ResultLabel1.Caption = FindKW
+    ResultForm.ResultLabel2.Caption = Worksheets("検索結果").Cells(1, 4)
+    ResultForm.ResultLabel3.Caption = Worksheets("検索結果").Cells(1, 2)
+    ResultForm.Image1.Picture = LoadPicture("C:\Users\shumi\OneDrive\デスクトップ\VBA\写真\ガスろう付装置1号機\" & Worksheets("検索結果").Cells(1, 3))
+    ResultForm.bunbo.Caption = Worksheets("検索結果").Cells(Rows.Count, 1).End(xlUp).Row
+    ResultForm.Show
+    Me.Hide
+End Function
+
+
+
+-----------------------------------------------------------------------------------------------------------
 Public resLab1 As String
 Public resLab2 As String
 Public resLab3 As String
@@ -38,7 +179,7 @@ Private Sub UserForm_Initialize()
 Dim bunbo As Long
 
     Image1.PictureSizeMode = fmPictureSizeModeZoom
-    bunbo = Worksheets("検索結果").Cells(Rows.Count, 1).End(xlUp).Row
+'    bunbo = Worksheets("検索結果").Cells(Rows.Count, 1).End(xlUp).Row
     If bunbo > 1 Then
         ResultForm.bunbo.Caption = bunbo
     End If
