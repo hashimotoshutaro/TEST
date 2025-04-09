@@ -1,0 +1,53 @@
+Public resLab1 As String
+Public resLab2 As String
+Public resLab3 As String
+Public i As Long
+'Public bunbo As Long
+
+
+Private Sub buckbtn_Click()
+Dim bunbonum As Integer
+    bunbonum = Val(ResultForm.bunbo.Caption)
+    If i = 1 Then
+    Exit Sub
+    End If
+    
+    i = i - 1
+    ResultForm.bunshi.Caption = i
+    ResultForm.ResultLabel2.Caption = Worksheets("検索結果").Cells(i, 4)
+    ResultForm.ResultLabel3.Caption = Worksheets("検索結果").Cells(i, 2)
+    ResultForm.Image1.Picture = LoadPicture("C:\Users\shumi\OneDrive\デスクトップ\VBA\写真\ガスろう付装置1号機\" & Worksheets("検索結果").Cells(i, 3))
+End Sub
+
+Private Sub nextbtn_Click()
+    Dim bunbonum As Integer
+    bunbonum = Val(ResultForm.bunbo.Caption)
+    If i = bunbonum Then
+    Exit Sub
+    End If
+    
+    i = i + 1
+    ResultForm.bunshi.Caption = i
+    ResultForm.ResultLabel2.Caption = Worksheets("検索結果").Cells(i, 4)
+    ResultForm.ResultLabel3.Caption = Worksheets("検索結果").Cells(i, 2)
+    ResultForm.Image1.Picture = LoadPicture("C:\Users\shumi\OneDrive\デスクトップ\VBA\写真\ガスろう付装置1号機\" & Worksheets("検索結果").Cells(i, 3))
+End Sub
+
+Private Sub UserForm_Initialize()
+    i = 1
+Dim bunbo As Long
+
+    Image1.PictureSizeMode = fmPictureSizeModeZoom
+    bunbo = Worksheets("検索結果").Cells(Rows.Count, 1).End(xlUp).Row
+    If bunbo > 1 Then
+        ResultForm.bunbo.Caption = bunbo
+    End If
+End Sub
+
+Private Sub btn確認完了_Click()
+    SearchForm2.txt型番.Value = Null
+    SearchForm2.txt名称.Value = Null
+    Worksheets("検索結果").Cells.Delete
+    Me.Hide
+End Sub
+
